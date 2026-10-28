@@ -1,0 +1,6 @@
+{
+  "name": "AURA AI Travel Rescue",
+  "description": "Minimalist AI-powered travel emergency rescue assistant comparing flight, train, and bus routes within budget and deadline constraints.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
