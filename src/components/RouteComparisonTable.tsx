@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plane, Train, Bus, Layers, Check, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Plane, Train, Bus, Layers, Check, ShieldCheck } from 'lucide-react';
 import { RescueResearchResult, RescueOption } from '../types';
 
 interface RouteComparisonTableProps {
@@ -123,10 +123,9 @@ export const RouteComparisonTable: React.FC<RouteComparisonTableProps> = ({
                   <td className="py-4 px-5 text-right">
                     <button
                       onClick={() => onSelectOption(opt)}
-                      className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-xs transition-colors inline-flex items-center gap-1"
+                      className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-xs transition-colors inline-flex items-center"
                     >
                       <span>Details</span>
-                      <ArrowRight className="w-3 h-3" />
                     </button>
                   </td>
                 </tr>

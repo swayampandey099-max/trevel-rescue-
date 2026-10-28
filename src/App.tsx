@@ -48,8 +48,6 @@ export default function App() {
       
       {/* Top Bar Header */}
       <TopBar
-        currentCurrency={currentCurrency}
-        onCurrencyChange={setCurrentCurrency}
         activeTab={activeTab}
         onTabChange={setActiveTab}
         hasActiveRescue={Boolean(rescueData)}

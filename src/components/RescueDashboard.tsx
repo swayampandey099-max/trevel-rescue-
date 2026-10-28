@@ -9,7 +9,6 @@ import {
   CheckCircle2, 
   AlertTriangle, 
   ShieldCheck, 
-  ArrowRight, 
   Copy, 
   Check, 
   Share2, 
@@ -326,10 +325,9 @@ Booking Advice: ${option.bookingAdvice}`;
             <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2">
               <button
                 onClick={() => setSelectedOption(option)}
-                className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center justify-center gap-1.5 transition-all active:scale-98"
+                className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center justify-center transition-all active:scale-98"
               >
                 <span>View Timeline & Instructions</span>
-                <ArrowRight className="w-3.5 h-3.5" />
               </button>
 
               <button

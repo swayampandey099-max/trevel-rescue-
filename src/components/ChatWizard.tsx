@@ -6,7 +6,6 @@ import {
   Clock, 
   DollarSign, 
   AlertCircle, 
-  ArrowRight, 
   RotateCcw,
   Plane,
   Train,
@@ -401,10 +400,9 @@ export const ChatWizard: React.FC<ChatWizardProps> = ({
                       else if (currentStepIndex === 2) handleSelectBudget(option);
                       else if (currentStepIndex === 3) handleSelectEmergency(option);
                     }}
-                    className="px-3.5 py-2 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-xl text-xs font-medium text-slate-700 hover:text-blue-700 shadow-2xs transition-all active:scale-97 flex items-center gap-1.5"
+                    className="px-3.5 py-2 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-xl text-xs font-medium text-slate-700 hover:text-blue-700 shadow-2xs transition-all active:scale-97"
                   >
                     <span>{option}</span>
-                    <ArrowRight className="w-3 h-3 text-blue-500 opacity-60" />
                   </button>
                 ))}
               </div>
@@ -462,7 +460,6 @@ export const ChatWizard: React.FC<ChatWizardProps> = ({
                   <>
                     <ShieldAlert className="w-4 h-4" />
                     <span>Execute AI Travel Rescue Research</span>
-                    <ArrowRight className="w-4 h-4" />
                   </>
                 )}
               </button>

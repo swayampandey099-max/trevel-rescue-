@@ -1,24 +1,17 @@
 import React from 'react';
-import { ShieldAlert, Globe, Compass, LifeBuoy } from 'lucide-react';
-import { CurrencySymbol } from '../types';
+import { ShieldAlert, Compass, LifeBuoy } from 'lucide-react';
 
 interface TopBarProps {
-  currentCurrency: CurrencySymbol;
-  onCurrencyChange: (curr: CurrencySymbol) => void;
   activeTab: 'wizard' | 'dashboard' | 'comparison' | 'rights';
   onTabChange: (tab: 'wizard' | 'dashboard' | 'comparison' | 'rights') => void;
   hasActiveRescue: boolean;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
-  currentCurrency,
-  onCurrencyChange,
   activeTab,
   onTabChange,
   hasActiveRescue,
 }) => {
-  const currencies: CurrencySymbol[] = ['$', '€', '£', '₹', '¥'];
-
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80 transition-all">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-8 px-4 sm:px-6 py-3.5">
@@ -86,24 +79,10 @@ export const TopBar: React.FC<TopBarProps> = ({
           </button>
         </nav>
 
-        {/* Zone 3: Single Primary Action & Currency Selector */}
+        {/* Zone 3: Single Primary Action & Fixed INR Currency Badge */}
         <div className="flex items-center gap-3 shrink-0">
-          {/* Currency Switcher */}
-          <div className="flex items-center gap-1 p-1 bg-slate-100/80 rounded-lg border border-slate-200/60">
-            <Globe className="w-3.5 h-3.5 text-slate-400 ml-1 hidden sm:inline" />
-            {currencies.map((curr) => (
-              <button
-                key={curr}
-                onClick={() => onCurrencyChange(curr)}
-                className={`px-2 py-1 text-xs font-semibold rounded-md transition-all ${
-                  currentCurrency === curr
-                    ? 'bg-white text-blue-600 shadow-xs border border-slate-200/80'
-                    : 'text-slate-500 hover:text-slate-800'
-                }`}
-              >
-                {curr}
-              </button>
-            ))}
+          <div className="px-2.5 py-1 bg-slate-100/90 border border-slate-200 text-slate-700 rounded-lg text-xs font-semibold font-mono-num hidden sm:flex items-center gap-1">
+            <span>₹ INR</span>
           </div>
 
           <button
