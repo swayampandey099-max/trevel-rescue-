@@ -36,11 +36,11 @@ export const ChatWizard: React.FC<ChatWizardProps> = ({
   isLoading,
 }) => {
   // Form State
-  const [origin, setOrigin] = useState('New York (JFK)');
-  const [destination, setDestination] = useState('London Heathrow (LHR)');
-  const [budget, setBudget] = useState<number>(600);
-  const [targetTime, setTargetTime] = useState('ASAP (< 8 Hours)');
-  const [emergencyType, setEmergencyType] = useState('Flight Cancelled / Reroute Urgent');
+  const [origin, setOrigin] = useState('New Delhi (DEL)');
+  const [destination, setDestination] = useState('Mumbai (BOM)');
+  const [budget, setBudget] = useState<number>(4500);
+  const [targetTime, setTargetTime] = useState('ASAP (< 12 Hours)');
+  const [emergencyType, setEmergencyType] = useState('Flight Cancelled / IRCTC Tatkal Reroute');
   const [customInput, setCustomInput] = useState('');
 
   // Active Wizard Step: 0 = Origin/Dest, 1 = Target Time, 2 = Budget, 3 = Emergency, 4 = Ready
@@ -50,15 +50,18 @@ export const ChatWizard: React.FC<ChatWizardProps> = ({
     {
       id: 'm1',
       sender: 'bot',
-      text: 'Welcome to Travel Rescue Agent. I am your multi-modal route research assistant. Where are you currently starting from, and where do you need to reach?',
+      text: 'Welcome to Travel Rescue Agent (Pan-India). I am your multi-modal route research assistant for Indian Railways (IRCTC/Vande Bharat), domestic airlines, state Volvo buses, and regional connections across all 28 states & 8 UTs. Where are you starting from, and where do you need to reach?',
       step: 'origin_dest',
       suggestions: [
-        'JFK New York ➔ LHR London',
-        'LAX Los Angeles ➔ ORD Chicago',
-        'SFO San Francisco ➔ SEA Seattle',
-        'CDG Paris ➔ ZRH Zurich',
-        'DEL Delhi ➔ BOM Mumbai',
-        'BER Berlin ➔ AMS Amsterdam',
+        'DEL New Delhi ➔ BOM Mumbai',
+        'BLR Bengaluru ➔ MAA Chennai',
+        'CCU Kolkata ➔ GHY Guwahati',
+        'HYD Hyderabad ➔ VZG Visakhapatnam',
+        'COK Kochi ➔ BLR Bengaluru',
+        'AMD Ahmedabad ➔ DEL New Delhi',
+        'SXR Srinagar ➔ DEL New Delhi',
+        'PNQ Pune ➔ BOM Mumbai',
+        'PAT Patna ➔ CCU Kolkata',
       ],
     },
   ]);
@@ -111,7 +114,12 @@ export const ChatWizard: React.FC<ChatWizardProps> = ({
         sender: 'bot',
         text: `Understood. What is your comfortable maximum budget cap for this trip? (Includes Flight, Train, Bus, or Shuttle fare combined)`,
         step: 'budget',
-        suggestions: [
+        suggestions: currentCurrency === '₹' ? [
+          '₹800 (AC Bus / Sleeper Rail)',
+          '₹2000 (3AC Express / State Volvo)',
+          '₹4500 (Vande Bharat / Air Standby)',
+          '₹9000 (Priority Air / Premium Tatkal)',
+        ] : [
           `${currentCurrency}150 (Budget Bus / Rail)`,
           `${currentCurrency}300 (Standard Express)`,
           `${currentCurrency}600 (Priority Reroute)`,

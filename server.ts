@@ -73,10 +73,183 @@ function buildFallbackRescue(
   targetTime: string,
   emergencyType: string
 ): RescueResearchResult {
-  const orig = origin || 'New York (JFK)';
-  const dest = destination || 'London (LHR)';
-  const curr = currency || '$';
-  const b = budget || 600;
+  const orig = origin || 'New Delhi (DEL)';
+  const dest = destination || 'Mumbai (BOM)';
+  const curr = currency || '₹';
+  const b = budget || (curr === '₹' ? 5000 : 300);
+
+  const isIndia = curr === '₹' || /delhi|mumbai|bengaluru|bangalore|chennai|kolkata|hyderabad|pune|jaipur|ahmedabad|kochi|guwahati|patna|chandigarh|lucknow|varanasi|goa|srinagar|bhubaneswar|ranchi/i.test(orig + dest);
+
+  if (isIndia) {
+    return {
+      origin: orig,
+      destination: dest,
+      targetDeadline: targetTime || 'ASAP (< 12 Hours)',
+      budgetCap: b,
+      currency: '₹',
+      emergencyType: emergencyType || 'Flight Cancelled / IRCTC Tatkal Reroute',
+      humanRescueSummary: `Pan-India Travel Rescue Analysis complete for ${orig} to ${dest}. In urgent travel scenarios, Vande Bharat / Rajdhani Express combined with domestic flight standby or AC sleeper Volvo coaches provide 98% arrival certainty within your budget of ₹${b}. Follow the step-by-step instructions below.`,
+      options: [
+        {
+          id: 'opt-vande-bharat',
+          type: 'train',
+          title: 'Vande Bharat / Rajdhani Express Priority Rail',
+          subtitle: 'High-speed Indian Railways corridor, guaranteed station arrival',
+          totalPrice: Math.min(b, 2450),
+          currency: '₹',
+          totalDuration: '5h 45m',
+          departureTime: '06:00',
+          arrivalTime: '11:45',
+          transfersCount: 0,
+          reliabilityScore: 98,
+          stressScore: 'Low',
+          recommended: true,
+          tagline: 'Best for reliability & city center access (Zero security wait)',
+          legs: [
+            {
+              mode: 'train',
+              operator: 'Indian Railways (IRCTC)',
+              codeOrNumber: '20901 Vande Bharat Express',
+              fromStation: `${orig} Central Junction`,
+              toStation: `${dest} Main Terminal`,
+              departureTime: '06:00',
+              arrivalTime: '11:45',
+              duration: '5h 45m',
+              price: Math.min(b, 2450),
+              baggageNotes: 'Free luggage up to 40kg, onboard hot meals included',
+              statusNotice: 'Operating on-time with high-speed WiFi'
+            }
+          ],
+          stepByStepInstructions: [
+            `Book Executive AC Chair Car seat directly via IRCTC app or Railway Station Reservation counter.`,
+            `Reach ${orig} Railway Station 20 minutes prior to departure; check electronic chart board at Main Concourse.`,
+            `Board Coach EC-1 for reserved quiet seating.`
+          ],
+          bookingAdvice: 'If general quota is full, request Tatkal or Emergency Quota (EQ) ticket at station counter 1 hour before departure.'
+        },
+        {
+          id: 'opt-flight-indigo',
+          type: 'flight',
+          title: 'Direct Domestic Air Reroute (IndiGo / Air India)',
+          subtitle: 'Fastest aerial corridor for long distance interstate rescue',
+          totalPrice: Math.max(3800, Math.round(b * 0.85)),
+          currency: '₹',
+          totalDuration: '2h 10m',
+          departureTime: '14:20',
+          arrivalTime: '16:30',
+          transfersCount: 0,
+          reliabilityScore: 94,
+          stressScore: 'Low',
+          recommended: false,
+          tagline: 'Fastest option (2 hours flight duration)',
+          legs: [
+            {
+              mode: 'flight',
+              operator: 'IndiGo / Air India Express',
+              codeOrNumber: '6E-512',
+              fromStation: `${orig} Terminal 2 (Domestic)`,
+              toStation: `${dest} Terminal 2`,
+              departureTime: '14:20',
+              arrivalTime: '16:30',
+              duration: '2h 10m',
+              price: Math.max(3800, Math.round(b * 0.85)),
+              baggageNotes: '15kg check-in + 7kg cabin luggage included',
+              statusNotice: 'Direct domestic flight with priority check-in'
+            }
+          ],
+          stepByStepInstructions: [
+            `Arrive at ${orig} Airport Terminal 2 at least 75 minutes before 14:20.`,
+            `Use self-service DigiYatra or airport kiosk to generate instant boarding pass.`,
+            `Proceed through Gate 4 security check to board 6E-512.`
+          ],
+          bookingAdvice: 'Book on official airline app or counter for same-day emergency reissuance.'
+        },
+        {
+          id: 'opt-bus-volvo',
+          type: 'bus',
+          title: 'Express Volvo AC Sleeper Coach (Zingbus / State Transport)',
+          subtitle: 'Overnight luxury sleeper coach, guaranteed seat',
+          totalPrice: Math.min(b, 1150),
+          currency: '₹',
+          totalDuration: '7h 15m',
+          departureTime: '21:30',
+          arrivalTime: '04:45',
+          transfersCount: 0,
+          reliabilityScore: 92,
+          stressScore: 'Moderate',
+          recommended: false,
+          tagline: 'Ultra budget option (Saves up to 75% budget)',
+          legs: [
+            {
+              mode: 'bus',
+              operator: 'Zingbus / KSRTC / MSRTC Shivneri',
+              codeOrNumber: 'ZB-IN88',
+              fromStation: `${orig} ISBT Bus Terminal`,
+              toStation: `${dest} Central Bus Stand`,
+              departureTime: '21:30',
+              arrivalTime: '04:45',
+              duration: '7h 15m',
+              price: Math.min(b, 1150),
+              baggageNotes: '1 large stowed suitcase + 1 cabin bag',
+              statusNotice: 'Live GPS tracking link sent via SMS'
+            }
+          ],
+          stepByStepInstructions: [
+            `Report to ISBT Gate 5 15 minutes before 21:30 departure time.`,
+            `Show SMS booking confirmation / M-Ticket to bus conductor.`,
+            `Enjoy single AC sleeper berth with charging port and clean blanket.`
+          ],
+          bookingAdvice: 'Best option if rail Tatkal tickets are exhausted. Instant seat booking via app.'
+        },
+        {
+          id: 'opt-hybrid-india',
+          type: 'hybrid',
+          title: 'Metro Express + Vande Bharat Hybrid Reroute',
+          subtitle: 'Metro feeder bypass to avoid city highway traffic',
+          totalPrice: Math.min(b, 2200),
+          currency: '₹',
+          totalDuration: '5h 10m',
+          departureTime: '07:15',
+          arrivalTime: '12:25',
+          transfersCount: 1,
+          reliabilityScore: 96,
+          stressScore: 'Low',
+          recommended: false,
+          tagline: 'Clever traffic-bypass route for peak hour emergencies',
+          legs: [
+            {
+              mode: 'shuttle',
+              operator: 'City Metro Rail Express',
+              codeOrNumber: 'MTR-LINE1',
+              fromStation: `${orig} Airport / Hub Station`,
+              toStation: `Railway Junction Station`,
+              departureTime: '07:15',
+              arrivalTime: '07:40',
+              duration: '25m',
+              price: 60,
+            },
+            {
+              mode: 'train',
+              operator: 'Indian Railways Vande Bharat',
+              codeOrNumber: '22436 VB',
+              fromStation: `Railway Junction Station`,
+              toStation: `${dest} Central`,
+              departureTime: '08:10',
+              arrivalTime: '12:25',
+              duration: '4h 15m',
+              price: Math.min(b - 60, 2140),
+            }
+          ],
+          stepByStepInstructions: [
+            `Take 25-minute Metro Express from ${orig} directly to Railway Junction Station (Token/QR ₹60).`,
+            `Walk across foot overbridge to Platform 1 for 08:10 Vande Bharat departure.`,
+            `Board Executive Chair Car to ${dest}.`
+          ],
+          bookingAdvice: 'Perfect route when airport approach roads have heavy monsoon or festival traffic jams.'
+        }
+      ]
+    };
+  }
 
   return {
     origin: orig,
@@ -123,126 +296,6 @@ function buildFallbackRescue(
           `Keep your original baggage tag receipt for priority baggage transfer.`
         ],
         bookingAdvice: 'Book directly through airline kiosk or official mobile app for instant boarding pass generation.'
-      },
-      {
-        id: 'opt-train-express',
-        type: 'train',
-        title: 'High-Speed Rail Corridor',
-        subtitle: 'Zero airport security delay, direct city center arrival',
-        totalPrice: Math.round(b * 0.45),
-        currency: curr,
-        totalDuration: '4h 15m',
-        departureTime: '11:10',
-        arrivalTime: '15:25',
-        transfersCount: 0,
-        reliabilityScore: 98,
-        stressScore: 'Low',
-        recommended: false,
-        tagline: 'Most reliable, 98% on-time guarantee',
-        legs: [
-          {
-            mode: 'train',
-            operator: 'EuroRail / Amtrak HighSpeed',
-            codeOrNumber: 'TR-209',
-            fromStation: `${orig} Central Union Station`,
-            toStation: `${dest} Grand Station`,
-            departureTime: '11:10',
-            arrivalTime: '15:25',
-            duration: '4h 15m',
-            price: Math.round(b * 0.45),
-            baggageNotes: '2 large bags free, power outlets at all seats',
-            statusNotice: 'On-time schedule operating normally'
-          }
-        ],
-        stepByStepInstructions: [
-          `Take 15-minute taxi or metro from airport to ${orig} Central Union Station.`,
-          `Scan QR code at Platform 3 automatic ticket gates.`,
-          `Board Coach 4 for reserved quiet car seating with high-speed WiFi.`
-        ],
-        bookingAdvice: 'Instant e-ticket download. No advance airport check-in required.'
-      },
-      {
-        id: 'opt-bus-express',
-        type: 'bus',
-        title: 'Express Overnight Coach',
-        subtitle: 'Maximum budget savings with guaranteed arrival',
-        totalPrice: Math.round(b * 0.22),
-        currency: curr,
-        totalDuration: '7h 30m',
-        departureTime: '09:45',
-        arrivalTime: '17:15',
-        transfersCount: 0,
-        reliabilityScore: 91,
-        stressScore: 'Moderate',
-        recommended: false,
-        tagline: 'Ultra budget pick (Saves 78% of budget)',
-        legs: [
-          {
-            mode: 'bus',
-            operator: 'Intercity Liner Express',
-            codeOrNumber: 'BUS-88X',
-            fromStation: `${orig} Central Bus Concourse`,
-            toStation: `${dest} Transport Hub`,
-            departureTime: '09:45',
-            arrivalTime: '17:15',
-            duration: '7h 30m',
-            price: Math.round(b * 0.22),
-            baggageNotes: '1 stowed suitcase + 1 cabin backpack',
-            statusNotice: 'Live GPS tracked with reclining seats'
-          }
-        ],
-        stepByStepInstructions: [
-          `Head to Bus Gate B12 at Central Concourse.`,
-          `Show digital ticket PDF to bus operator 15 minutes before 09:45 departure.`,
-          `Enjoy onboard reclining seats, power sockets, and onboard lavatory.`
-        ],
-        bookingAdvice: 'Best option if airport tickets exceed budget. Purchase via operator web app.'
-      },
-      {
-        id: 'opt-hybrid-rescue',
-        type: 'hybrid',
-        title: 'Hybrid Rescue: Train + Regional Flight',
-        subtitle: 'Bypasses congested main airport via regional hub',
-        totalPrice: Math.round(b * 0.65),
-        currency: curr,
-        totalDuration: '5h 20m',
-        departureTime: '12:00',
-        arrivalTime: '17:20',
-        transfersCount: 1,
-        reliabilityScore: 95,
-        stressScore: 'Moderate',
-        recommended: false,
-        tagline: 'Clever bypass route around cancellations',
-        legs: [
-          {
-            mode: 'train',
-            operator: 'Metro Shuttle Express',
-            codeOrNumber: 'MS-104',
-            fromStation: `${orig} Airport Station`,
-            toStation: `Regional Hub Airport Terminal`,
-            departureTime: '12:00',
-            arrivalTime: '12:45',
-            duration: '45m',
-            price: Math.round(b * 0.1),
-          },
-          {
-            mode: 'flight',
-            operator: 'SkyHop Regional',
-            codeOrNumber: 'SH-912',
-            fromStation: `Regional Hub Airport Terminal`,
-            toStation: `${dest} City Airport`,
-            departureTime: '14:15',
-            arrivalTime: '17:20',
-            duration: '3h 05m',
-            price: Math.round(b * 0.55),
-          }
-        ],
-        stepByStepInstructions: [
-          `Board Metro Shuttle Express MS-104 at Airport Station (45m train ride).`,
-          `Arrive at Regional Hub Airport Terminal with 90m buffer time for security.`,
-          `Check in for SkyHop SH-912 direct to ${dest}.`
-        ],
-        bookingAdvice: 'Ideal when primary airport flights are fully booked or delayed.'
       }
     ]
   };

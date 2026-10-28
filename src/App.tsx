@@ -14,7 +14,7 @@ import { CurrencySymbol, RescueRequestParams, RescueResearchResult, RescueOption
 import { Compass, AlertCircle, MessageSquare } from 'lucide-react';
 
 export default function App() {
-  const [currentCurrency, setCurrentCurrency] = useState<CurrencySymbol>('$');
+  const [currentCurrency, setCurrentCurrency] = useState<CurrencySymbol>('₹');
   const [activeTab, setActiveTab] = useState<'wizard' | 'dashboard' | 'comparison' | 'rights'>('wizard');
   const [rescueData, setRescueData] = useState<RescueResearchResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
