@@ -402,38 +402,64 @@ export const ChatWizard: React.FC<ChatWizardProps> = ({
           </div>
         </div>
 
-        {/* Live Parameter Bar Summary */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="p-2.5 bg-slate-50/80 rounded-xl border border-slate-200/60">
-            <span className="text-[10px] font-semibold text-slate-400 block uppercase">Origin & Destination</span>
-            <div className="text-xs font-semibold text-slate-800 truncate mt-0.5 flex items-center gap-1">
-              <MapPin className="w-3 h-3 text-blue-600 shrink-0" />
-              <span>{origin} ➔ {destination}</span>
+        {/* Live Parameter Bar Summary & Instant AI Execution */}
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="p-2.5 bg-slate-50/80 rounded-xl border border-slate-200/60">
+              <span className="text-[10px] font-semibold text-slate-400 block uppercase">Origin & Destination</span>
+              <div className="text-xs font-semibold text-slate-800 truncate mt-0.5 flex items-center gap-1">
+                <MapPin className="w-3 h-3 text-blue-600 shrink-0" />
+                <span>{origin} ➔ {destination}</span>
+              </div>
+            </div>
+
+            <div className="p-2.5 bg-slate-50/80 rounded-xl border border-slate-200/60">
+              <span className="text-[10px] font-semibold text-slate-400 block uppercase">Target Arrival</span>
+              <div className="text-xs font-semibold text-slate-800 truncate mt-0.5 flex items-center gap-1">
+                <Clock className="w-3 h-3 text-blue-600 shrink-0" />
+                <span>{targetTime}</span>
+              </div>
+            </div>
+
+            <div className="p-2.5 bg-slate-50/80 rounded-xl border border-slate-200/60">
+              <span className="text-[10px] font-semibold text-slate-400 block uppercase">Max Budget</span>
+              <div className="text-xs font-semibold text-slate-800 truncate mt-0.5 flex items-center gap-1">
+                <DollarSign className="w-3 h-3 text-blue-600 shrink-0" />
+                <span>₹{budget}</span>
+              </div>
+            </div>
+
+            <div className="p-2.5 bg-slate-50/80 rounded-xl border border-slate-200/60">
+              <span className="text-[10px] font-semibold text-slate-400 block uppercase">Context</span>
+              <div className="text-xs font-semibold text-slate-800 truncate mt-0.5 flex items-center gap-1">
+                <AlertCircle className="w-3 h-3 text-blue-600 shrink-0" />
+                <span>{emergencyType}</span>
+              </div>
             </div>
           </div>
 
-          <div className="p-2.5 bg-slate-50/80 rounded-xl border border-slate-200/60">
-            <span className="text-[10px] font-semibold text-slate-400 block uppercase">Target Arrival</span>
-            <div className="text-xs font-semibold text-slate-800 truncate mt-0.5 flex items-center gap-1">
-              <Clock className="w-3 h-3 text-blue-600 shrink-0" />
-              <span>{targetTime}</span>
-            </div>
-          </div>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 border-t border-slate-100">
+            <span className="text-[11px] text-slate-500 font-bernhard">
+              Click AI Execution to research options for these parameters immediately
+            </span>
 
-          <div className="p-2.5 bg-slate-50/80 rounded-xl border border-slate-200/60">
-            <span className="text-[10px] font-semibold text-slate-400 block uppercase">Max Budget</span>
-            <div className="text-xs font-semibold text-slate-800 truncate mt-0.5 flex items-center gap-1">
-              <DollarSign className="w-3 h-3 text-blue-600 shrink-0" />
-              <span>₹{budget}</span>
-            </div>
-          </div>
-
-          <div className="p-2.5 bg-slate-50/80 rounded-xl border border-slate-200/60">
-            <span className="text-[10px] font-semibold text-slate-400 block uppercase">Context</span>
-            <div className="text-xs font-semibold text-slate-800 truncate mt-0.5 flex items-center gap-1">
-              <AlertCircle className="w-3 h-3 text-blue-600 shrink-0" />
-              <span>{emergencyType}</span>
-            </div>
+            <button
+              onClick={triggerResearch}
+              disabled={isLoading}
+              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl shadow-xs flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 shrink-0"
+            >
+              {isLoading ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Researching...</span>
+                </>
+              ) : (
+                <>
+                  <ShieldAlert className="w-4 h-4" />
+                  <span>AI Execution</span>
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>
@@ -568,29 +594,41 @@ export const ChatWizard: React.FC<ChatWizardProps> = ({
         <div className="p-4 border-t border-slate-100 bg-white space-y-3">
           
           {currentStepIndex < 4 ? (
-            <form onSubmit={handleCustomSubmit} className="flex items-center gap-2">
+            <form onSubmit={handleCustomSubmit} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               <input
                 type="text"
                 value={customInput}
                 onChange={(e) => setCustomInput(e.target.value)}
                 placeholder={
                   currentStepIndex === 0
-                    ? 'Or enter custom origin & destination e.g. Boston to Philadelphia...'
+                    ? 'Or enter custom origin & destination e.g. Delhi to Mumbai...'
                     : currentStepIndex === 1
                     ? 'Enter target time e.g. Today by 18:00...'
                     : currentStepIndex === 2
-                    ? 'Enter max budget number e.g. 450...'
+                    ? 'Enter max budget number e.g. 4500...'
                     : 'Enter custom emergency details...'
                 }
                 className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white transition-all"
               />
-              <button
-                type="submit"
-                className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-all shrink-0 active:scale-95"
-              >
-                <span>Send</span>
-                <Send className="w-3.5 h-3.5" />
-              </button>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="submit"
+                  className="px-4 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center justify-center gap-1.5 transition-all flex-1 sm:flex-none active:scale-95"
+                >
+                  <span>Send</span>
+                  <Send className="w-3.5 h-3.5" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={triggerResearch}
+                  disabled={isLoading}
+                  className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center justify-center gap-1.5 transition-all flex-1 sm:flex-none active:scale-95 disabled:opacity-50"
+                >
+                  <ShieldAlert className="w-3.5 h-3.5" />
+                  <span>AI Execution</span>
+                </button>
+              </div>
             </form>
           ) : (
             <motion.div

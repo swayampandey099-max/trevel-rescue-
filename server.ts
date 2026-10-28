@@ -47,6 +47,8 @@ export interface RescueOption {
   reliabilityScore: number; // e.g. 94%
   stressScore: 'Low' | 'Moderate' | 'High';
   recommended: boolean;
+  whyRecommended?: string;
+  badgeCategory?: 'cheapest' | 'fastest' | 'bestOverall' | 'standard';
   tagline: string;
   legs: RouteLeg[];
   stepByStepInstructions: string[];
