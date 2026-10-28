@@ -226,10 +226,8 @@ Booking Advice: ${option.bookingAdvice}`;
       {/* Route Options Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {filteredOptions.map((option) => (
-          <motion.div
+          <div
             key={option.id}
-            whileHover={{ y: -2 }}
-            transition={{ duration: 0.15 }}
             className={`bg-white rounded-2xl border p-6 shadow-xs relative flex flex-col justify-between transition-all ${
               option.recommended
                 ? 'border-blue-500 ring-2 ring-blue-500/10'
@@ -343,7 +341,7 @@ Booking Advice: ${option.bookingAdvice}`;
               </button>
             </div>
 
-          </motion.div>
+          </div>
         ))}
       </div>
 
@@ -352,9 +350,10 @@ Booking Advice: ${option.bookingAdvice}`;
         {selectedOption && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/40 backdrop-blur-xs">
             <motion.div
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.96 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
               className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 p-6 sm:p-8 space-y-6 relative"
             >
               <button

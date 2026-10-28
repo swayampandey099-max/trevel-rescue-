@@ -91,10 +91,10 @@ export const InteractiveChatConcierge: React.FC<InteractiveChatConciergeProps> =
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex justify-end bg-slate-900/30 backdrop-blur-xs">
         <motion.div
-          initial={{ x: '100%' }}
-          animate={{ x: 0 }}
-          exit={{ x: '100%' }}
-          transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
           className="w-full max-w-md bg-white h-full shadow-2xl flex flex-col border-l border-slate-200"
         >
           {/* Header */}
