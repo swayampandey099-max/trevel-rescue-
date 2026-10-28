@@ -104,6 +104,8 @@ function buildFallbackRescue(
           reliabilityScore: 98,
           stressScore: 'Low',
           recommended: true,
+          badgeCategory: 'bestOverall',
+          whyRecommended: 'AI Best Overall Recommendation: Highest on-time reliability (98%) with zero airport security queues, costing 40% less than flight standby while arriving in central city.',
           tagline: 'Best for reliability & city center access (Zero security wait)',
           legs: [
             {
@@ -141,6 +143,8 @@ function buildFallbackRescue(
           reliabilityScore: 94,
           stressScore: 'Low',
           recommended: false,
+          badgeCategory: 'fastest',
+          whyRecommended: 'AI Fastest Route Choice: Saves over 3.5 hours compared to ground transport. Recommended when reaching your destination before afternoon deadline is critical.',
           tagline: 'Fastest option (2 hours flight duration)',
           legs: [
             {
@@ -178,7 +182,9 @@ function buildFallbackRescue(
           reliabilityScore: 92,
           stressScore: 'Moderate',
           recommended: false,
-          tagline: 'Ultra budget option (Saves up to 75% budget)',
+          badgeCategory: 'cheapest',
+          whyRecommended: 'AI Lowest Cost Alternative: Saves over ₹3,000 off airfares and ₹1,300 off train fares. Guarantees a personal sleeper berth when all flights and trains are sold out.',
+          tagline: 'Ultra budget pick (Saves up to 75% budget)',
           legs: [
             {
               mode: 'bus',
@@ -215,6 +221,8 @@ function buildFallbackRescue(
           reliabilityScore: 96,
           stressScore: 'Low',
           recommended: false,
+          badgeCategory: 'standard',
+          whyRecommended: 'AI Smart Bypass Alternative: Combines airport metro shuttle with high-speed rail to bypass city traffic bottlenecks during peak hour cancellations.',
           tagline: 'Clever traffic-bypass route for peak hour emergencies',
           legs: [
             {

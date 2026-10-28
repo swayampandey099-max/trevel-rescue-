@@ -11,7 +11,10 @@ import {
   Train,
   Bus,
   ShieldAlert,
-  Compass
+  Compass,
+  AlertTriangle,
+  Layers,
+  Sparkles
 } from 'lucide-react';
 import { CurrencySymbol, RescueRequestParams } from '../types';
 
@@ -40,7 +43,9 @@ export const ChatWizard: React.FC<ChatWizardProps> = ({
   const [budget, setBudget] = useState<number>(4500);
   const [targetTime, setTargetTime] = useState('ASAP (< 12 Hours)');
   const [emergencyType, setEmergencyType] = useState('Flight Cancelled / IRCTC Tatkal Reroute');
+  const [preferredMode, setPreferredMode] = useState<'all' | 'flight' | 'train' | 'bus' | 'hybrid'>('all');
   const [customInput, setCustomInput] = useState('');
+  const [showDisruptedModal, setShowDisruptedModal] = useState(false);
 
   // Active Wizard Step: 0 = Origin/Dest, 1 = Target Time, 2 = Budget, 3 = Emergency, 4 = Ready
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -113,16 +118,11 @@ export const ChatWizard: React.FC<ChatWizardProps> = ({
         sender: 'bot',
         text: `Understood. What is your comfortable maximum budget cap for this trip? (Includes Flight, Train, Bus, or Shuttle fare combined)`,
         step: 'budget',
-        suggestions: currentCurrency === '₹' ? [
+        suggestions: [
           '₹800 (AC Bus / Sleeper Rail)',
           '₹2000 (3AC Express / State Volvo)',
           '₹4500 (Vande Bharat / Air Standby)',
           '₹9000 (Priority Air / Premium Tatkal)',
-        ] : [
-          `${currentCurrency}150 (Budget Bus / Rail)`,
-          `${currentCurrency}300 (Standard Express)`,
-          `${currentCurrency}600 (Priority Reroute)`,
-          `${currentCurrency}1200 (Emergency Any-Mode)`,
         ],
       },
     ]);
@@ -131,21 +131,22 @@ export const ChatWizard: React.FC<ChatWizardProps> = ({
 
   const handleSelectBudget = (budgetOption: string) => {
     const rawVal = budgetOption.replace(/[^0-9]/g, '');
-    const numVal = parseInt(rawVal, 10) || 600;
+    const numVal = parseInt(rawVal, 10) || 4500;
     setBudget(numVal);
 
     setMessages((prev) => [
       ...prev,
-      { id: `usr-${Date.now()}`, sender: 'user', text: `Budget Cap: ${currentCurrency}${numVal}` },
+      { id: `usr-${Date.now()}`, sender: 'user', text: `Budget Cap: ₹${numVal}` },
       {
         id: `bot-${Date.now()}`,
         sender: 'bot',
-        text: `Logged budget limit of ${currentCurrency}${numVal}. Finally, what is the primary urgency context for your travel rescue?`,
+        text: `Logged budget limit of ₹${numVal}. Finally, what is the primary urgency context for your travel rescue?`,
         step: 'emergency',
         suggestions: [
           'Flight Cancelled / Stranded at Airport',
-          'Missed Rail Connection / Last-minute',
-          'Fastest Reroute (Ignore Carbon)',
+          'Train Cancelled / Tatkal Standby Needed',
+          'Flight / Train Delayed (>2 Hours)',
+          'Missed Connection at Transfer Station',
           'Strict Budget Priority (Lowest Cost)',
         ],
       },
@@ -162,6 +163,34 @@ export const ChatWizard: React.FC<ChatWizardProps> = ({
         id: `bot-${Date.now()}`,
         sender: 'bot',
         text: `All rescue parameters locked. Ready to analyze real flight schedules, high-speed rail corridors, and express bus connections for ${origin} to ${destination}. Click "Execute AI Route Research" below.`,
+        step: 'complete',
+      },
+    ]);
+    setCurrentStepIndex(4);
+  };
+
+  const handleDisruptionPreset = (type: 'cancelled' | 'delayed' | 'missed') => {
+    setShowDisruptedModal(false);
+    if (type === 'cancelled') {
+      setEmergencyType('Flight / Train Cancelled (Immediate Reroute)');
+    } else if (type === 'delayed') {
+      setEmergencyType('Flight / Train Delayed (>2 Hours)');
+    } else {
+      setEmergencyType('Missed Connection at Junction');
+    }
+    setTargetTime('ASAP (< 6 Hours)');
+    
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: `usr-disrupted-${Date.now()}`,
+        sender: 'user',
+        text: `EMERGENCY DISRUPTION: ${type === 'cancelled' ? 'Flight/Train Cancelled' : type === 'delayed' ? 'Delayed >2 Hours' : 'Missed Connection'}`,
+      },
+      {
+        id: `bot-disrupted-${Date.now()}`,
+        sender: 'bot',
+        text: `Disruption logged! Ready to research emergency standby flights, Tatkal rail seats, and Volvo coaches for ${origin} ➔ ${destination}.`,
         step: 'complete',
       },
     ]);
@@ -200,33 +229,37 @@ export const ChatWizard: React.FC<ChatWizardProps> = ({
       origin,
       destination,
       budget,
-      currency: currentCurrency,
+      currency: '₹',
       targetTime,
-      travelPriority: 'Fastest Safe Reroute',
+      travelPriority: preferredMode === 'all' ? 'Fastest Safe Reroute' : `${preferredMode.toUpperCase()} Priority`,
       emergencyType,
     });
   };
 
   const resetWizard = () => {
-    setOrigin('New York (JFK)');
-    setDestination('London Heathrow (LHR)');
-    setBudget(600);
-    setTargetTime('ASAP (< 8 Hours)');
-    setEmergencyType('Flight Cancelled / Reroute Urgent');
+    setOrigin('New Delhi (DEL)');
+    setDestination('Mumbai (BOM)');
+    setBudget(4500);
+    setTargetTime('ASAP (< 12 Hours)');
+    setEmergencyType('Flight Cancelled / IRCTC Tatkal Reroute');
+    setPreferredMode('all');
     setCurrentStepIndex(0);
     setMessages([
       {
         id: 'm1',
         sender: 'bot',
-        text: 'Welcome to Travel Rescue Agent. I am your multi-modal route research assistant. Where are you currently starting from, and where do you need to reach?',
+        text: 'Welcome to Travel Rescue Agent (Pan-India). I am your multi-modal route research assistant for Indian Railways (IRCTC/Vande Bharat), domestic airlines, state Volvo buses, and regional connections across all 28 states & 8 UTs. Where are you starting from, and where do you need to reach?',
         step: 'origin_dest',
         suggestions: [
-          'JFK New York ➔ LHR London',
-          'LAX Los Angeles ➔ ORD Chicago',
-          'SFO San Francisco ➔ SEA Seattle',
-          'CDG Paris ➔ ZRH Zurich',
-          'DEL Delhi ➔ BOM Mumbai',
-          'BER Berlin ➔ AMS Amsterdam',
+          'DEL New Delhi ➔ BOM Mumbai',
+          'BLR Bengaluru ➔ MAA Chennai',
+          'CCU Kolkata ➔ GHY Guwahati',
+          'HYD Hyderabad ➔ VZG Visakhapatnam',
+          'COK Kochi ➔ BLR Bengaluru',
+          'AMD Ahmedabad ➔ DEL New Delhi',
+          'SXR Srinagar ➔ DEL New Delhi',
+          'PNQ Pune ➔ BOM Mumbai',
+          'PAT Patna ➔ CCU Kolkata',
         ],
       },
     ]);
@@ -237,6 +270,72 @@ export const ChatWizard: React.FC<ChatWizardProps> = ({
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       
+      {/* Disruption Alert Quick Trigger Bar */}
+      <div className="bg-amber-50 border border-amber-200/80 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+        <div className="flex items-center gap-2.5 text-xs text-amber-900 font-medium">
+          <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
+          <span>Is your current flight, train or bus disrupted right now?</span>
+        </div>
+
+        <button
+          onClick={() => setShowDisruptedModal(true)}
+          className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs rounded-xl shadow-xs transition-colors shrink-0"
+        >
+          My Journey is Disrupted
+        </button>
+      </div>
+
+      {/* Disruption Type Selector Modal */}
+      {showDisruptedModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full border border-slate-200 shadow-2xl space-y-4">
+            <div className="space-y-1">
+              <h3 className="font-americana text-lg font-bold text-slate-900">
+                Select Disruption Scenario
+              </h3>
+              <p className="text-xs text-slate-500">
+                Choose what happened to activate emergency rerouting.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <button
+                onClick={() => handleDisruptionPreset('cancelled')}
+                className="w-full p-3 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl text-left text-xs font-semibold text-red-900 flex items-center justify-between transition-colors"
+              >
+                <span>🚨 Flight or Train Cancelled</span>
+                <span className="text-[10px] text-red-700">Immediate Reroute</span>
+              </button>
+
+              <button
+                onClick={() => handleDisruptionPreset('delayed')}
+                className="w-full p-3 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl text-left text-xs font-semibold text-amber-900 flex items-center justify-between transition-colors"
+              >
+                <span>⏳ Flight or Train Delayed (&gt;2 Hours)</span>
+                <span className="text-[10px] text-amber-700">Skip Long Delay</span>
+              </button>
+
+              <button
+                onClick={() => handleDisruptionPreset('missed')}
+                className="w-full p-3 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl text-left text-xs font-semibold text-blue-900 flex items-center justify-between transition-colors"
+              >
+                <span>🏃 Missed Connection at Junction</span>
+                <span className="text-[10px] text-blue-700">Catch Next Transit</span>
+              </button>
+            </div>
+
+            <div className="pt-2 text-right">
+              <button
+                onClick={() => setShowDisruptedModal(false)}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-medium"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Soft Header Card */}
       <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-xs relative overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -258,13 +357,37 @@ export const ChatWizard: React.FC<ChatWizardProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="flex items-center gap-2 px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-600">
-              <span className="flex items-center gap-1"><Plane className="w-3.5 h-3.5 text-blue-600" /> Flights</span>
-              <span>·</span>
-              <span className="flex items-center gap-1"><Train className="w-3.5 h-3.5 text-blue-600" /> Trains</span>
-              <span>·</span>
-              <span className="flex items-center gap-1"><Bus className="w-3.5 h-3.5 text-blue-600" /> Buses</span>
+          {/* Mode Selection Buttons */}
+          <div className="space-y-1 shrink-0">
+            <div className="text-[10px] font-semibold uppercase text-slate-400">Preferred Mode Filter:</div>
+            <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl text-xs font-medium">
+              <button
+                onClick={() => setPreferredMode('all')}
+                className={`px-2.5 py-1.5 rounded-lg transition-colors ${preferredMode === 'all' ? 'bg-white text-slate-900 shadow-2xs font-semibold' : 'text-slate-600'}`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setPreferredMode('flight')}
+                className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition-colors ${preferredMode === 'flight' ? 'bg-white text-blue-600 shadow-2xs font-semibold' : 'text-slate-600'}`}
+              >
+                <Plane className="w-3 h-3" />
+                Flight
+              </button>
+              <button
+                onClick={() => setPreferredMode('train')}
+                className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition-colors ${preferredMode === 'train' ? 'bg-white text-emerald-600 shadow-2xs font-semibold' : 'text-slate-600'}`}
+              >
+                <Train className="w-3 h-3" />
+                Train
+              </button>
+              <button
+                onClick={() => setPreferredMode('bus')}
+                className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition-colors ${preferredMode === 'bus' ? 'bg-white text-amber-600 shadow-2xs font-semibold' : 'text-slate-600'}`}
+              >
+                <Bus className="w-3 h-3" />
+                Bus
+              </button>
             </div>
           </div>
         </div>
@@ -301,7 +424,7 @@ export const ChatWizard: React.FC<ChatWizardProps> = ({
             <span className="text-[10px] font-semibold text-slate-400 block uppercase">Max Budget</span>
             <div className="text-xs font-semibold text-slate-800 truncate mt-0.5 flex items-center gap-1">
               <DollarSign className="w-3 h-3 text-blue-600 shrink-0" />
-              <span>{currentCurrency}{budget}</span>
+              <span>₹{budget}</span>
             </div>
           </div>
 
@@ -343,6 +466,35 @@ export const ChatWizard: React.FC<ChatWizardProps> = ({
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Reset Flow</span>
+          </button>
+        </div>
+
+        {/* Clickable Quick Prompt Chips Bar */}
+        <div className="p-3 bg-blue-50/40 border-b border-blue-100/60 flex items-center gap-2 overflow-x-auto text-xs text-slate-600">
+          <span className="text-[10px] font-semibold uppercase text-slate-400 shrink-0">Quick Prompts:</span>
+          <button
+            onClick={() => handleSelectBudget('₹3000 (Budget Cap)')}
+            className="px-2.5 py-1 bg-white border border-slate-200 hover:border-blue-300 rounded-lg shrink-0 hover:text-blue-700 text-[11px] font-medium transition-colors"
+          >
+            "I have a ₹3,000 budget cap"
+          </button>
+          <button
+            onClick={() => handleSelectTargetTime('Tonight before Midnight')}
+            className="px-2.5 py-1 bg-white border border-slate-200 hover:border-blue-300 rounded-lg shrink-0 hover:text-blue-700 text-[11px] font-medium transition-colors"
+          >
+            "I need to reach before Midnight"
+          </button>
+          <button
+            onClick={() => handleSelectEmergency('Flight Cancelled / Stranded at Airport')}
+            className="px-2.5 py-1 bg-white border border-slate-200 hover:border-blue-300 rounded-lg shrink-0 hover:text-blue-700 text-[11px] font-medium transition-colors"
+          >
+            "Flight cancelled at Delhi Terminal 3"
+          </button>
+          <button
+            onClick={() => handleSelectEmergency('Train Cancelled / Tatkal Standby Needed')}
+            className="px-2.5 py-1 bg-white border border-slate-200 hover:border-blue-300 rounded-lg shrink-0 hover:text-blue-700 text-[11px] font-medium transition-colors"
+          >
+            "Is Vande Bharat Tatkal available?"
           </button>
         </div>
 
@@ -465,7 +617,7 @@ export const ChatWizard: React.FC<ChatWizardProps> = ({
               </button>
 
               <div className="text-center text-[11px] text-slate-400 font-bernhard text-sm">
-                calculates fastest routes, timing schedules, and exact cost breakdowns
+                calculates cheapest, fastest, and best overall routes against budget and arrival deadline
               </div>
             </motion.div>
           )}

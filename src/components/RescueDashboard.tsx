@@ -17,7 +17,12 @@ import {
   Luggage,
   X,
   MessageSquare,
-  ShieldAlert
+  ShieldAlert,
+  Zap,
+  Tag,
+  Trophy,
+  HelpCircle,
+  TrendingDown
 } from 'lucide-react';
 import { RescueResearchResult, RescueOption, RouteLeg } from '../types';
 
@@ -41,12 +46,23 @@ export const RescueDashboard: React.FC<RescueDashboardProps> = ({
     return opt.type === selectedFilter;
   });
 
+  // Identify Top 3 Featured Alternatives: Best Overall, Fastest, Cheapest
+  const bestOverallOption = rescueData.options.find(o => o.badgeCategory === 'bestOverall') || rescueData.options[0];
+  
+  // Find option with shortest duration string
+  const fastestOption = rescueData.options.find(o => o.badgeCategory === 'fastest') || 
+    [...rescueData.options].sort((a, b) => parseInt(a.totalDuration) - parseInt(b.totalDuration))[0];
+  
+  // Find option with lowest price
+  const cheapestOption = rescueData.options.find(o => o.badgeCategory === 'cheapest') || 
+    [...rescueData.options].sort((a, b) => a.totalPrice - b.totalPrice)[0];
+
   const handleCopySummary = (option: RescueOption) => {
     const legsText = option.legs
       .map((l) => `${l.mode.toUpperCase()}: ${l.operator} (${l.codeOrNumber}) ${l.fromStation} ➔ ${l.toStation} [${l.departureTime} - ${l.arrivalTime}]`)
       .join('\n');
 
-    const text = `AURA TRAVEL RESCUE PLAN
+    const text = `TRAVEL RESCUE BLUEPRINT
 Corridor: ${rescueData.origin} ➔ ${rescueData.destination}
 Option: ${option.title} (${option.currency}${option.totalPrice})
 Duration: ${option.totalDuration} | Reliability: ${option.reliabilityScore}%
@@ -138,6 +154,151 @@ Booking Advice: ${option.bookingAdvice}`;
               </span>
             </div>
           </div>
+
+        </div>
+      </div>
+
+      {/* Top 3 Featured Alternative Cards (Best Overall, Fastest, Cheapest) */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="font-americana text-xl font-bold text-slate-900 flex items-center gap-2">
+            <span>Primary Alternatives Comparison</span>
+            <span className="font-bernhard text-blue-600 font-normal text-lg lowercase border-l border-slate-200 pl-2">
+              budget vs speed
+            </span>
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          {/* 1. Best Overall Card */}
+          {bestOverallOption && (
+            <div className="bg-white rounded-2xl border-2 border-blue-500 p-5 shadow-xs relative flex flex-col justify-between space-y-3">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="px-2.5 py-1 bg-blue-600 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                    <Trophy className="w-3 h-3" />
+                    <span>Best Overall</span>
+                  </span>
+                  <span className="font-mono-num text-xs font-semibold text-slate-500">
+                    {bestOverallOption.reliabilityScore}% Reliable
+                  </span>
+                </div>
+
+                <div className="font-americana font-bold text-slate-900 text-base">
+                  {bestOverallOption.title}
+                </div>
+
+                <div className="flex items-center justify-between text-xs font-mono-num pt-1">
+                  <div>
+                    <span className="text-[10px] text-slate-400 block uppercase">Price</span>
+                    <span className="font-bold text-blue-600 text-lg">{bestOverallOption.currency}{bestOverallOption.totalPrice}</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] text-slate-400 block uppercase">Duration</span>
+                    <span className="font-bold text-slate-800 text-sm">{bestOverallOption.totalDuration}</span>
+                  </div>
+                </div>
+
+                <p className="text-[11px] text-slate-600 leading-relaxed bg-blue-50/50 p-2.5 rounded-xl border border-blue-100">
+                  {bestOverallOption.whyRecommended || 'Balanced speed, price and delay resiliency.'}
+                </p>
+              </div>
+
+              <button
+                onClick={() => setSelectedOption(bestOverallOption)}
+                className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors"
+              >
+                Select Best Overall Blueprint
+              </button>
+            </div>
+          )}
+
+          {/* 2. Fastest Card */}
+          {fastestOption && (
+            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs relative flex flex-col justify-between space-y-3">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="px-2.5 py-1 bg-emerald-600 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                    <Zap className="w-3 h-3" />
+                    <span>Fastest Route</span>
+                  </span>
+                  <span className="font-mono-num text-xs font-semibold text-slate-500">
+                    {fastestOption.totalDuration}
+                  </span>
+                </div>
+
+                <div className="font-americana font-bold text-slate-900 text-base">
+                  {fastestOption.title}
+                </div>
+
+                <div className="flex items-center justify-between text-xs font-mono-num pt-1">
+                  <div>
+                    <span className="text-[10px] text-slate-400 block uppercase">Price</span>
+                    <span className="font-bold text-blue-600 text-lg">{fastestOption.currency}{fastestOption.totalPrice}</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] text-slate-400 block uppercase">Departure</span>
+                    <span className="font-bold text-slate-800 text-sm">{fastestOption.departureTime}</span>
+                  </div>
+                </div>
+
+                <p className="text-[11px] text-slate-600 leading-relaxed bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  {fastestOption.whyRecommended || 'Shortest travel time over the corridor.'}
+                </p>
+              </div>
+
+              <button
+                onClick={() => setSelectedOption(fastestOption)}
+                className="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors"
+              >
+                Select Fastest Blueprint
+              </button>
+            </div>
+          )}
+
+          {/* 3. Cheapest Card */}
+          {cheapestOption && (
+            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs relative flex flex-col justify-between space-y-3">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="px-2.5 py-1 bg-amber-600 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                    <TrendingDown className="w-3 h-3" />
+                    <span>Cheapest Route</span>
+                  </span>
+                  <span className="font-mono-num text-xs font-semibold text-emerald-600">
+                    Save up to 75%
+                  </span>
+                </div>
+
+                <div className="font-americana font-bold text-slate-900 text-base">
+                  {cheapestOption.title}
+                </div>
+
+                <div className="flex items-center justify-between text-xs font-mono-num pt-1">
+                  <div>
+                    <span className="text-[10px] text-slate-400 block uppercase">Price</span>
+                    <span className="font-bold text-emerald-600 text-lg">{cheapestOption.currency}{cheapestOption.totalPrice}</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] text-slate-400 block uppercase">Duration</span>
+                    <span className="font-bold text-slate-800 text-sm">{cheapestOption.totalDuration}</span>
+                  </div>
+                </div>
+
+                <p className="text-[11px] text-slate-600 leading-relaxed bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  {cheapestOption.whyRecommended || 'Lowest fare option within budget cap.'}
+                </p>
+              </div>
+
+              <button
+                onClick={() => setSelectedOption(cheapestOption)}
+                className="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors"
+              >
+                Select Cheapest Blueprint
+              </button>
+            </div>
+          )}
 
         </div>
       </div>
@@ -288,6 +449,17 @@ Booking Advice: ${option.bookingAdvice}`;
                 </div>
               </div>
 
+              {/* Why AI Recommends Explanation */}
+              {option.whyRecommended && (
+                <div className="p-3 bg-blue-50/50 rounded-xl border border-blue-100/80 space-y-1">
+                  <div className="text-[10px] font-bold text-blue-900 uppercase flex items-center gap-1">
+                    <HelpCircle className="w-3 h-3 text-blue-600" />
+                    <span>Why AI Recommends This:</span>
+                  </div>
+                  <p className="text-xs text-slate-700 leading-snug">{option.whyRecommended}</p>
+                </div>
+              )}
+
               {/* Reliability & Stress Metric */}
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="p-2.5 rounded-lg border border-slate-100 bg-slate-50/50">
@@ -387,6 +559,17 @@ Booking Advice: ${option.bookingAdvice}`;
                   <span className="font-bold text-emerald-600 text-base">{selectedOption.reliabilityScore}%</span>
                 </div>
               </div>
+
+              {/* Why AI Recommends Box inside Modal */}
+              {selectedOption.whyRecommended && (
+                <div className="p-4 bg-blue-50 border border-blue-200/80 rounded-xl space-y-1">
+                  <div className="font-semibold text-blue-900 text-xs flex items-center gap-1.5">
+                    <HelpCircle className="w-4 h-4 text-blue-600" />
+                    <span>Why AI Recommends This Option:</span>
+                  </div>
+                  <p className="text-xs text-slate-700 leading-relaxed">{selectedOption.whyRecommended}</p>
+                </div>
+              )}
 
               {/* Leg-by-leg breakdown */}
               <div className="space-y-3">

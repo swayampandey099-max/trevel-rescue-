@@ -29,6 +29,8 @@ export interface RescueOption {
   stressScore: 'Low' | 'Moderate' | 'High';
   recommended: boolean;
   tagline: string;
+  whyRecommended?: string;
+  badgeCategory?: 'cheapest' | 'fastest' | 'bestOverall' | 'standard';
   legs: RouteLeg[];
   stepByStepInstructions: string[];
   bookingAdvice: string;
